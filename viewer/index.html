@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>轨迹关联动画演示</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+</head>
+
+<body>
+  <div class="app">
+    <header class="toolbar">
+      <div class="left">
+        <h1>轨迹关联动画</h1>
+        <p>按时间顺序快速显现点，再形成关联轨迹</p>
+      </div>
+      <div class="right controls">
+        <button id="playPauseBtn">播放</button>
+        <button id="resetBtn">重置</button>
+        <label>
+          速度
+          <select id="speedSelect">
+            <option value="1">1x</option>
+            <option value="2" selected>2x</option>
+            <option value="5">5x</option>
+            <option value="10">10x</option>
+            <option value="20">20x</option>
+          </select>
+        </label>
+        <label>
+          关联延迟
+          <input id="assocDelayRange" type="range" min="80" max="1000" step="20" value="240" />
+          <span id="assocDelayText">240ms</span>
+        </label>
+        <label class="file-label">
+          导入CSV
+          <input id="fileInput" type="file" accept=".csv,text/csv" />
+        </label>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="canvas-wrap">
+        <div id="map"></div>
+        <canvas id="trajCanvas"></canvas>
+        <div class="hud">
+          <div>当前时间：<span id="timeText">--</span></div>
+          <div>已显示点：<span id="pointCountText">0</span></div>
+          <div>已关联轨迹数：<span id="trajCountText">0</span></div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>说明</h2>
+        <ol>
+          <li>默认自动尝试读取 <code>../data/output/1_associated.csv</code>。</li>
+          <li>若浏览器限制本地文件读取，请使用“导入CSV”按钮选择文件。</li>
+          <li>播放时，点会按时间顺序快速出现，随后延迟连线形成轨迹。</li>
+        </ol>
+        <section class="preview">
+          <h3>已读入点预览</h3>
+          <p class="preview-tip">画布中深色小点=已读入并保留的点，彩色点=当前最新读入点。</p>
+          <p id="pointsPreviewMeta" class="preview-meta">--</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ts</th>
+                  <th>tra_id</th>
+                  <th>x</th>
+                  <th>y</th>
+                </tr>
+              </thead>
+              <tbody id="pointsPreviewBody"></tbody>
+            </table>
+          </div>
+        </section>
+        <p id="statusText" class="status">等待加载数据…</p>
+      </aside>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="./app.js"></script>
+</body>
+
+</html>

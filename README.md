@@ -1,7 +1,8 @@
-前端启动 start_viewer.py
-输出csv文件  run_csv_association.py
-关联接口调用  traj_association_module.py
-
+# 项目流程说明
+- 前端启动：`start_viewer.py`（输出 CSV 文件）
+- 数据处理：`run_csv_association.py`（调用关联接口）
+- 核心模块：`traj_association_module.py`（轨迹关联算法）
+- 
 # 关联模块接口说明
 
 ## 输入接口

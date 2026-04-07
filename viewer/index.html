@@ -20,6 +20,7 @@
       <div class="right controls">
         <button id="playPauseBtn">播放</button>
         <button id="resetBtn">重置</button>
+        <button id="togglePredictBtn">隐藏预测</button>
         <label>
           速度
           <select id="speedSelect">
@@ -46,6 +47,7 @@
       <section class="canvas-wrap">
         <div id="map"></div>
         <canvas id="trajCanvas"></canvas>
+        <div id="hoverTrajTag" class="hover-traj-tag"></div>
         <div class="hud">
           <div>当前时间：<span id="timeText">--</span></div>
           <div>已显示点：<span id="pointCountText">0</span></div>
@@ -56,26 +58,22 @@
       <aside class="panel">
         <h2>说明</h2>
         <ol>
-          <li>默认自动尝试读取 <code>../data/output/1_associated.csv</code>。</li>
-          <li>若浏览器限制本地文件读取，请使用“导入CSV”按钮选择文件。</li>
-          <li>播放时，点会按时间顺序快速出现，随后延迟连线形成轨迹。</li>
+          <li>默认读取 <code>../data/output/1_associated.csv</code> 与 <code>../data/input/predict_result.csv</code>。</li>
+          <li>可通过“隐藏预测/显示预测”控制预测段可见性。</li>
+          <li>可按轨迹ID查询并选中，地图仅显示当前ID。</li>
         </ol>
         <section class="preview">
-          <h3>已读入点预览</h3>
-          <p class="preview-tip">画布中深色小点=已读入并保留的点，彩色点=当前最新读入点。</p>
+          <h3>轨迹筛选</h3>
+          <div class="query-row">
+            <input id="trajSearchInput" type="text" placeholder="输入轨迹ID关键字" />
+            <button id="clearFilterBtn">显示全部</button>
+          </div>
           <p id="pointsPreviewMeta" class="preview-meta">--</p>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ts</th>
-                  <th>tra_id</th>
-                  <th>x</th>
-                  <th>y</th>
-                </tr>
-              </thead>
-              <tbody id="pointsPreviewBody"></tbody>
-            </table>
+          <div id="trajList" class="traj-list"></div>
+          <div class="pager">
+            <button id="prevPageBtn">上一页</button>
+            <span id="pageInfoText">1 / 1</span>
+            <button id="nextPageBtn">下一页</button>
           </div>
         </section>
         <p id="statusText" class="status">等待加载数据…</p>

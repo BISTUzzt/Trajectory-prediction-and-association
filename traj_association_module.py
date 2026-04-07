@@ -163,8 +163,8 @@ class TrajectoryAssociator:
             其中 z 缺失时默认 0。
 
         输出格式:
-        - {traj_id: [{"ts": ts, "id": traj_id, "tra_id": traj_id, "x": x, "y": y, "z": z}, ...]}
-            输出统一包含 6 个字段，z 恒存在。
+        - {traj_id: [{"ts": ts, "id": traj_id, "x": x, "y": y, "z": z}, ...]}
+            输出统一包含 5 个字段，z 恒存在。
     """
 
     def __init__(self, config: AssociationConfig | None = None):
@@ -242,7 +242,6 @@ class TrajectoryAssociator:
                     {
                         "ts": t,
                         "id": int(traj_id),
-                        "tra_id": int(traj_id),
                         "x": x,
                         "y": y,
                         "z": z,
@@ -321,18 +320,15 @@ class TrajectoryAssociator:
                 if not isinstance(info, dict):
                     raise TypeError("输出点必须是 information 字典")
 
-                expected_keys = {"ts", "id", "tra_id", "x", "y", "z"}
+                expected_keys = {"ts", "id", "x", "y", "z"}
                 keys = set(info.keys())
                 if keys != expected_keys:
-                    raise ValueError("输出 information 字段必须且只能是 ts/id/tra_id/x/y/z")
+                    raise ValueError("输出 information 字段必须且只能是 ts/id/x/y/z")
 
                 _ = float(info["ts"])
                 out_id = int(info["id"])
-                out_tra_id = int(info["tra_id"])
                 if out_id != traj_id:
                     raise ValueError("输出 information.id 必须等于外层 traj_id")
-                if out_tra_id != traj_id:
-                    raise ValueError("输出 information.tra_id 必须等于外层 traj_id")
                 _ = float(info["x"])
                 _ = float(info["y"])
                 _ = float(info["z"])

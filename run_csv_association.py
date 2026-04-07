@@ -95,6 +95,7 @@ def load_input_csv_first5(
                     float(point.get("z", 0.0)),
                 )
                 src_id_index[key].append(int(point["id"]))
+
                 if ts not in ts_text_index:
                     ts_text_index[ts] = ts_raw if ts_raw else format_seconds_to_ts(ts)
 
@@ -118,31 +119,52 @@ def save_output_csv(
     for _, infos in output.items():
         rows.extend(infos)
 
-    rows.sort(key=lambda r: (int(r["tra_id"]), float(r["ts"])))
+    resolved_rows: List[Dict[str, float | int]] = []
+    for r in rows:
+        key: PointKey = (
+            float(r["ts"]),
+            float(r["x"]),
+            float(r["y"]),
+            float(r["z"]),
+        )
+        src_ids = src_id_index.get(key, [])
+        src_id = src_ids.pop(0) if src_ids else int(r["id"])
+        resolved_rows.append(
+            {
+                "ts": float(r["ts"]),
+                "id": int(src_id),
+                "x": float(r["x"]),
+                "y": float(r["y"]),
+                "z": float(r["z"]),
+            }
+        )
+
+    grouped_rows: DefaultDict[int, List[Dict[str, float | int]]] = defaultdict(list)
+    for r in resolved_rows:
+        grouped_rows[int(r["id"])].append(r)
+
+    for gid in grouped_rows:
+        grouped_rows[gid].sort(key=lambda r: float(r["ts"]))
+
+    ordered_ids = sorted(
+        grouped_rows.keys(),
+        key=lambda gid: (float(grouped_rows[gid][0]["ts"]), int(gid)),
+    )
 
     with output_path.open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["ts", "id", "tra_id", "x", "y", "z"])
+        writer = csv.DictWriter(f, fieldnames=["ts", "id", "x", "y", "z"])
         writer.writeheader()
-        for r in rows:
-            key: PointKey = (
-                float(r["ts"]),
-                float(r["x"]),
-                float(r["y"]),
-                float(r["z"]),
-            )
-            src_ids = src_id_index.get(key, [])
-            src_id = src_ids.pop(0) if src_ids else -1
-
-            writer.writerow(
-                {
-                    "ts": ts_text_index.get(float(r["ts"]), format_seconds_to_ts(float(r["ts"]))),
-                    "id": int(src_id),
-                    "tra_id": int(r["tra_id"]),
-                    "x": float(r["x"]),
-                    "y": float(r["y"]),
-                    "z": float(r["z"]),
-                }
-            )
+        for gid in ordered_ids:
+            for r in grouped_rows[gid]:
+                writer.writerow(
+                    {
+                        "ts": ts_text_index.get(float(r["ts"]), format_seconds_to_ts(float(r["ts"]))),
+                        "id": int(r["id"]),
+                        "x": float(r["x"]),
+                        "y": float(r["y"]),
+                        "z": float(r["z"]),
+                    }
+                )
 
     return output_path
 
